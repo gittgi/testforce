@@ -1,0 +1,7 @@
+{
+  "name": "sandbox-workbench",
+  "version": "0.1.0",
+  "description": "Salesforce Sandbox 테스트 계획·검토·실행·증거 분석을 로컬 실행 엔진과 연결하는 Claude Code Skill",
+  "author": { "name": "Sandbox Workbench contributors" },
+  "license": "MIT"
+}

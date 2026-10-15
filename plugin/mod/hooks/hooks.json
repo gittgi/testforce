@@ -1,0 +1,4 @@
+{
+  "description": "Testforce의 사용자 제어 패널. 실제 버튼 동작만 승인된 엔진으로 전달하며 모델 호출·직접 Salesforce 쓰기·권한 우회는 하지 않습니다.",
+  "modules": ["./register.js"]
+}

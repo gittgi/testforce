@@ -1,0 +1,7 @@
+{
+  "name": "testforce-panel",
+  "version": "0.3.0",
+  "description": "Testforce 계획·승인·실행·전후 비교·정리 패널. 별도 HTTP 서버 없이 로컬 실행 엔진을 사용합니다.",
+  "author": { "name": "Testforce contributors" },
+  "license": "MIT"
+}
