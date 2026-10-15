@@ -11,7 +11,7 @@ const root =
 const entry = resolve(root, "dist/cli/main.js");
 if (!existsSync(entry)) {
   process.stderr.write(
-    "실행 엔진을 찾을 수 없습니다. 도구 루트에서 npm ci 및 npm run build를 실행하거나 SFTW_ENGINE_ROOT를 지정하세요.\n",
+    "실행 엔진을 찾을 수 없습니다. 배포 파일을 다시 내려받아 dist 폴더를 복원하거나 SFTW_ENGINE_ROOT를 지정하세요.\n",
   );
   process.exit(1);
 }

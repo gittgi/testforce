@@ -1,6 +1,6 @@
 # Excel·Data Loader 파일 계약
 
-확인일: 2026-10-15. 이 문서는 실제 구현한 `src/workbook/index.ts`, `src/imports/index.ts`, `src/reports/index.ts`의 계약이다. 테스트는 Node에서 생성·수정한 XLSX/CSV fixture를 사용한다. Microsoft Excel 앱, Windows Data Loader, 실제 Sandbox 업로드는 별도 통합 검증이 필요하다.
+확인일: 2026-10-15. 이 문서는 실제 구현한 `dist/workbook/index.js`, `dist/imports/index.js`, `dist/reports/index.js`의 계약이다. 테스트는 Node에서 생성·수정한 XLSX/CSV fixture를 사용한다. Microsoft Excel 앱, Windows Data Loader, 실제 Sandbox 업로드는 별도 통합 검증이 필요하다.
 
 ## 계획 Excel
 
@@ -38,10 +38,10 @@ SOAP 요청 최대 크기와 Data Loader의 요청 분할을 고려해야 한다
 
 설치 패키지에서 ExcelJS 4.4.0, csv-parse 7.0.3, csv-stringify 6.9.0, yauzl 3.4.0과 각 MIT 라이선스를 확인했다. [ExcelJS 공식 저장소](https://github.com/exceljs/exceljs) 및 [yauzl 공식 API](https://github.com/thejoshwolfe/yauzl)를 참고했다. ExcelJS는 직접 수식 계산을 요청하지 않으며 읽기 전 별도 ZIP/실행 요소 검사를 수행한다. 취약점 검사는 전체 lockfile의 `npm audit` 결과를 따른다.
 
-실행한 검증: `npx vitest run tests/unit/files.test.ts tests/unit/files-security.test.ts` — 23개 통과. ZIP 크기·경로·매크로·외부 엔티티 차단, 실제 조회값의 타입별 비교, ExcelJS의 UUID 사용 경로까지 포함한다. 한글·공백을 가진 임시 경로, CRLF CSV, XLSX 편집 왕복을 Node에서 검증했다. 실제 Office 편집과 Windows 파일 잠금, 실제 Data Loader success/error 응답은 이 테스트의 범위가 아니다.
+개발 단계의 파일 검증 23개가 통과했다. 이 배포본에는 테스트 파일·테스트 실행 도구를 포함하지 않는다. ZIP 크기·경로·매크로·외부 엔티티 차단, 실제 조회값의 타입별 비교, ExcelJS의 UUID 사용 경로까지 포함한다. 한글·공백을 가진 임시 경로, CRLF CSV, XLSX 편집 왕복을 Node에서 검증했다. 실제 Office 편집과 Windows 파일 잠금, 실제 Data Loader success/error 응답은 이 테스트의 범위가 아니다.
 
 
-2026-10-15 의존성 점검에서 ExcelJS의 uuid 8.3.2에 [GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq)가 보고되었다. ExcelJS 소스의 사용 지점은 인자 없는 `v4()`이며 취약점의 buffer 입력 경로를 사용하지 않는다. 그래도 `exceljs -> uuid 11.1.1`의 한정 override를 권고한다. [uuid 11.1.1 공식 package exports](https://github.com/uuidjs/uuid/blob/v11.1.1/package.json)가 CommonJS `require`를 제공함을 확인했다. `files-security.test.ts`는 실제 conditional formatting extension 직렬화를 통해 해당 의존성 호출 경로를 검증한다. 최종 설치·audit 결과는 프로젝트 status/compatibility 기록을 따른다.
+2026-10-15 의존성 점검에서 ExcelJS의 uuid 8.3.2에 [GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq)가 보고되었다. ExcelJS 소스의 사용 지점은 인자 없는 `v4()`이며 취약점의 buffer 입력 경로를 사용하지 않는다. 그래도 `exceljs -> uuid 11.1.1`의 한정 override를 권고한다. [uuid 11.1.1 공식 package exports](https://github.com/uuidjs/uuid/blob/v11.1.1/package.json)가 CommonJS `require`를 제공함을 확인했다. 개발 단계에서 실제 조건부 서식 직렬화를 통해 해당 의존성 호출 경로를 검증했다. 이 배포본은 해당 override를 적용한다.
 
 `verifyImportMapping(mapping, actualRow, describe?)`는 ID·문자열·Boolean·Decimal·시간대 날짜·null을 실제 재조회값과 비교한다. 이 함수는 반드시 `ownership: unresolved`를 반환한다. 성공 CSV의 전체 입력값과 현재 레코드가 일치하더라도, CSV 자체가 이번 실행의 신규 생성 증거가 되지는 않는다. 수동·불명 결과 ID는 기본 자동 정리에서 제외한다. 엔진이 더 강한 생성 근거를 별도로 확보하지 않았다면 파일만으로 소유 구분을 승격하지 않는다.
 
