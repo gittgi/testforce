@@ -1,5 +1,7 @@
 Third-party notices for code bundled into the local web UI.
-Server-side dependencies are installed separately with npm; their licenses are in node_modules.
+Server-side dependencies are installed with npm or included in the portable ZIP;
+their licenses are retained in node_modules. The portable Windows Node.js runtime
+is distributed with its upstream license at runtime/LICENSE.
 
 react 19.3.1
 MIT License
