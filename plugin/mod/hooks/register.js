@@ -82,8 +82,18 @@ async function connect($) {
     const root = $.plugin.root;
     const candidate = JSON.parse(await $.fs.read(root + "/config.json"));
     const absolute = (s) => typeof s === "string" && (/^\//.test(s) || /^[A-Za-z]:[\\/]/.test(s)) && !/[\u0000\r\n]/.test(s);
-    if (!absolute(candidate.bridgeEntry) || !absolute(candidate.nodeExecutable)) throw new Error("Testforce Mod 설치 설정을 확인하세요. npm run install:claude 명령으로 다시 설치할 수 있습니다.");
-    config = { bridgeEntry: candidate.bridgeEntry, nodeExecutable: candidate.nodeExecutable };
+    if (candidate.schemaVersion === 2) {
+      // Copy-only distribution: fixed paths inside the loaded plugin, never cwd/PATH.
+      // A copied config cannot redirect execution outside this portable installation.
+      if (candidate.layout !== "portable-windows-x64-v1" || !absolute(root) || Object.keys(candidate).some((key) => !["schemaVersion", "layout"].includes(key)))
+        throw new Error("Testforce 복사 설치 파일을 확인하세요. ZIP의 testforce 폴더 전체를 다시 복사하세요.");
+      const base = root.replaceAll("\\", "/").replace(/\/$/, "");
+      config = { bridgeEntry: base + "/engine/dist/mod/main.js", nodeExecutable: base + "/runtime/node.exe" };
+    } else {
+      if ((candidate.schemaVersion !== undefined && candidate.schemaVersion !== 1) || !absolute(candidate.bridgeEntry) || !absolute(candidate.nodeExecutable))
+        throw new Error("Testforce 설치 설정을 확인하세요. 복사 설치는 ZIP의 testforce 폴더 전체를 복원하고, 기존 npm 설치는 설치기를 다시 실행하세요.");
+      config = { bridgeEntry: candidate.bridgeEntry, nodeExecutable: candidate.nodeExecutable };
+    }
   }
   workspace = await $.session.cwd();
 }
